@@ -17,15 +17,7 @@ Import your input data for the model
 summer = pd.read_csv("AssB_Input_Group4_summer.csv")
 winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 
-    # dynamic electricity prices vector
-    #household's 15-min PV generation vector
-    #household's 15-min demand vector
-
-
 #for now setting up just for summer as thinking when we make it a function can specify summer or winter
-Ppv = summer['PV generation [kW]']
-Pdem = summer['Residential load [kW]']
-Celec = summer['Electricity price [euro/kWh]']
 
 """
 Parameters value
@@ -51,84 +43,67 @@ f1 = plt.figure(1)
 
 ######## other parameters too add?
 
-
-"""
-Step 1: Create a model
-"""
-m=gp.Model()
-
-"""
-Step 2: Define variables
-"""
-######## Define your decision variables for the time horizon using addVars
-
-# note one parameter is obj = , we have not set it, not sure what it does
-Pbat_ch = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
-Pbat_dis = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
-
-Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
-
-SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
+def get_minimal_cost(season):
     
-"""
-Step 3: Add constraints
-"""
-######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
-   
-######## Power balance formula
-m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))
+    #load either summer or winter data
+    Ppv = season['PV generation [kW]']
+    Pdem = season['Residential load [kW]']
+    Celec = season['Electricity price [euro/kWh]']
+    
+    # Create Model
+    m=gp.Model()
+    
+    # Add Variables
+    Pbat_ch = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
+    Pbat_dis = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
+    
+    Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
+    
+    SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
         
-######## Battery SoC dynamics constraint 
-m.addConstr(SoC[0] == SoC0)
-m.addConstrs(SoC[t] == SoC[t-1] + ((Pbat_ch[t]*Delta_t*eff_ch)/C_bat) - (Pbat_dis[t]*Delta_t)/(eff_dis*C_bat) for t in range(1,T))
-
-
-######## SoC constraints 
-m.addConstrs(SoC_min <= SoC[t] for t in range(T))
-m.addConstrs(SoC_max >= SoC[t] for t in range(T))
-
-######## Power boundaries
-#Pbat_ch[0] = SoC0*C
+    # Add Constraints  
+    ## Power balance formula
+    m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))      
+    ## Battery SoC dynamics constraint 
+    m.addConstr(SoC[0] == SoC0)
+    m.addConstrs(SoC[t] == SoC[t-1] + ((Pbat_ch[t]*Delta_t*eff_ch)/C_bat) - (Pbat_dis[t]*Delta_t)/(eff_dis*C_bat) for t in range(1,T))
+    ## SoC constraints 
+    m.addConstrs(SoC_min <= SoC[t] for t in range(T))
+    m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
-"""
-Step 4: Set objective function
-"""
+    # Set objective function and solve
+    obj = gp.quicksum(Celec[t]*Pgrid[t] for t in range(T))
+    m.setObjective(obj, gp.GRB.MINIMIZE)
+    m.optimize()
+    
+    # Add the outcomes to the season dataframe
+    season['Pgrid'] = m.getAttr("X", Pgrid).values()
+    season['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()
+    season['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
+    season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis']
+    season['SoC'] = m.getAttr("X", SoC).values()
+    
+    return season
 
-obj = gp.quicksum(Celec[t]*Pgrid[t] for t in range(T))
-m.setObjective(obj, gp.GRB.MINIMIZE)
+get_minimal_cost(summer)
+get_minimal_cost(winter)
 
+def get_plots(season1, season2):
 
-"""
-Step 5: Solve model
-"""
-m.optimize()
-
-"""
-Step 6: Print variables values for optimal solution
-""" 
-######## Get the values of the decision variables
-
-
-summer['Pgrid'] = P=m.getAttr("X", Pgrid).values()
-summer['Pbat_ch'] = P=m.getAttr("X", Pbat_ch).values()
-summer['Pbat_dis'] = P=m.getAttr("X", Pbat_dis).values()
-summer['Pbat'] = summer['Pbat_ch'] - summer['Pbat_dis']
-summer['SoC'] = P=m.getAttr("X", SoC).values()
-
-
-"""
-Step 7: Plot optimal power output from each generator 
-"""
-######## Plot results
-#f2 = plt.figure(2)
-
-# Plot results
-plot = summer['PV generation [kW]'].plot(kind='line')
-summer.Pgrid.plot(kind='line')
-summer.Pbat.plot(kind='line')
-summer.SoC.plot(kind='line')
-summer['Residential load [kW]'].plot(kind='line')
-plot.legend()
-
+        fig, axs = plt.subplots(2)
+        
+        axs[0].plot(season1['PV generation [kW]'])
+        axs[0].plot(season1.Pgrid)
+        axs[0].plot(season1.Pbat)
+        axs[0].plot(season1.SoC)
+        axs[0].plot(season1['Residential load [kW]'])
+        
+        axs[1].plot(season2['PV generation [kW]'])
+        axs[1].plot(season2.Pgrid)
+        axs[1].plot(season2.Pbat)
+        axs[1].plot(season2.SoC)
+        axs[1].plot(season2['Residential load [kW]'])
+         
+get_plots(summer, winter)
 
 
