@@ -25,7 +25,7 @@ winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 #for now setting up just for summer as thinking when we make it a function can specify summer or winter
 Ppv = summer['PV generation [kW]']
 Pdem = summer['Residential load [kW]']
-
+Celec = summer['Electricity price [euro/kWh]']
 
 """
 Parameters value
@@ -33,7 +33,6 @@ Parameters value
 ######## Time-step
 Delta_t = 0.25 # 15 minute (0.25 hour) intervals
 T=int(24*3*1/Delta_t) #number of time-slots (in three days)
-t=np.linspace(1, T, num=T) 
 
 ######## Limits on grid and max, min, and initial SOC
 Pgridmax = 3 #[kW]
@@ -84,29 +83,33 @@ Step 3: Add constraints
 m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))
         
 ######## Battery SoC dynamics constraint 
-m.addConstrs(SoC[t] == SoC[t-1] + (Pbatmax*Delta_t*eff_ch/C_bat) - (Pbatmax*Delta_t/eff_dis/C_bat) for t in range(T))
+SoC[0] == SoC0
+m.addConstrs(SoC[t] == SoC[t-1] + (Pbatmax*Delta_t*eff_ch/C_bat) - (Pbatmax*Delta_t/eff_dis/C_bat) for t in range(1,T))
+
 
 ######## SoC constraints 
 m.addConstrs(SoC_min <= SoC[t] for t in range(T))
 m.addConstrs(SoC_max >= SoC[t] for t in range(T))
 
 ######## Power boundaries   
-m.addConstrs(abs(Pgrid[t]) <= Pgridmax for t in range(T))
+m.addConstrs(Pgrid[t] <= Pgridmax for t in range(T))
+m.addConstrs(Pgrid[t] >= -Pgridmax for t in range(T))
+
 m.addConstrs(Pbat_ch[t] <= Pbatmax for t in range(T))
 m.addConstrs(Pbat_dis[t] <= Pbatmax for t in range(T))
     
 """
 Step 4: Set objective function
 """
-obj = 
 
-#m.setObjective()
+obj = gp.quicksum(Celec[t]*Pgrid[t] for t in range(T))
+m.setObjective(obj, gp.GRB.MINIMIZE)
+
 
 """
 Step 5: Solve model
 """
-
-#m.optimize()
+m.optimize()
 
 """
 Step 6: Print variables values for optimal solution
