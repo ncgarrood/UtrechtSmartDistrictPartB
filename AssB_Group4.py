@@ -92,17 +92,23 @@ model.addConstrs((x[i] == 1) >> (y[i] + z[i] <= 5) for i in range(5))
 
 """
 
+<<<<<<< Updated upstream
+=======
+
+######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
+>>>>>>> Stashed changes
     
 ######## Power balance formula
 #mPgrid + Ppv + Pbat_dis == Pdem + Pbat
-m.addConstrs((Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch == Pdem[t]), for t in range (T)) 
-        
+m.addConstr(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range (T)) 
+
+
 ######## Battery SoC dynamics constraint 
 
 
 
 ######## SoC constraints 
-
+〖SoC〗_min  ≤〖SoC〗_t≤ 〖SoC〗_max
 
 
 ######## Power boundaries
