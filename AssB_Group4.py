@@ -14,16 +14,17 @@ import matplotlib.pyplot as plt #for plotting
 """
 Import your input data for the model
 """
-
+summer = pd.read_csv("AssB_Input_Group4_summer.csv")
+winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 
     # dynamic electricity prices vector
     #household's 15-min PV generation vector
     #household's 15-min demand vector
 
-#summer
-AssB_Input_Group4_summer
-#winter 
-AssB_Input_Group4_winter   
+
+#for now setting up just for summer as thinking when we make it a function can specify summer or winter
+Ppv = summer['PV generation [kW]']
+Pdem = summer['Residential load [kW]']
 
 
 """
@@ -31,7 +32,8 @@ Parameters value
 """
 ######## Time-step
 Delta_t = 0.25 # 15 minute (0.25 hour) intervals
-T=24*3*1/Delta_t #number of time-slots (in three days)
+T=int(24*3*1/Delta_t) #number of time-slots (in three days)
+t=np.linspace(1, T, num=int(T)) 
 
 ######## Limits on grid and max, min, and initial SOC
 Pgridmax = 3 #[kW]
@@ -48,8 +50,7 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
-
-
+######## other parameters too add?
 
 
 """
@@ -61,11 +62,17 @@ m=gp.Model()
 Step 2: Define variables
 """
 ######## Define your decision variables for the time horizon using addVars
- 
-m.addVar()
- 
+
+
+# note one parameter is obj = , we have not set it, not sure what it does
+Pbat_ch = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
+Pbat_dis = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
+
+Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
+
+SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
+
     
- 
 """
 Step 3: Add constraints
 """
@@ -91,6 +98,10 @@ model.addConstrs((x[i] == 1) >> (y[i] + z[i] <= 5) for i in range(5))
 
 
 """
+
+
+######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
+ 
 
     
 ######## Power balance formula
