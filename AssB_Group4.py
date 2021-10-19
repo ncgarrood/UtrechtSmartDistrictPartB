@@ -30,7 +30,7 @@ Parameters value
 """
 ######## Time-step
 Delta_t = 0.25 # 15 minute (0.25 hour) intervals
-T=24*3*1/Delta_t #number of time-slots (in three days)
+T=int(24*3*1/Delta_t) #number of time-slots (in three days)
 t=np.linspace(1, T, num=int(T)) 
 
 ######## Limits on grid and max, min, and initial SOC
@@ -48,8 +48,8 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
-######## other parameters we added, N is number of power sources (note batt_ch and batt_disch as seperate)
-N = 5
+######## other parameters too add?
+
 
 """
 Step 1: Create a model
@@ -60,20 +60,20 @@ m=gp.Model()
 Step 2: Define variables
 """
 ######## Define your decision variables for the time horizon using addVars
- 
-Pgrid = m.AddVar(float(-'inf'), float('inf'), 1, gp.GRB.CONTINUOUS, "Pgrid")
 
-Pbat_ch = m.AddVar(0, float('inf'), 1, gp.GRB.CONTINUOUS, "Pbat_ch")
-Pbat_dis = m.AddVar(0, float('inf'), 1, gp.GRB.CONTINUOUS, "Pbat_dis")
+# note one parameter is obj = , we have not set it, not sure what it does
+Pbat_ch = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
+Pbat_dis = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
 
-SoC = m.AddVar(SoC_min, SoC_max, 1, gp.GRB.CONTINUOUS, "Pbat_ch")
+Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
+
+SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
     
- 
 """
 Step 3: Add constraints
 """
 
-######## Nonnegative variables 
+######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
  
     
 ######## Power balance formula
