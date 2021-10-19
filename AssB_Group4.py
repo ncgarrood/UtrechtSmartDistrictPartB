@@ -20,6 +20,12 @@ Import your input data for the model
     #household's 15-min PV generation vector
     #household's 15-min demand vector
 
+#summer
+AssB_Input_Group4_summer
+#winter 
+AssB_Input_Group4_winter   
+
+
 """
 Parameters value
 """
@@ -49,25 +55,47 @@ f1 = plt.figure(1)
 """
 Step 1: Create a model
 """
-
+m=gp.Model()
 
 """
 Step 2: Define variables
 """
 ######## Define your decision variables for the time horizon using addVars
  
-    
+m.addVar()
+ 
     
  
 """
 Step 3: Add constraints
 """
+m.addConstrs()
 
-######## Nonnegative variables 
- 
+"""
+Example 2:
+m.addConstrs(p[n,t] <= Pmax[n] for t in range(T) for n in range(N))
+m.addConstrs(p[n,t] >= Pmin[n] for t in range(T) for n in range(N))
+m.addConstrs(gp.quicksum(p[n,t] for n in range(N)) >= d[t] for t in range(T))
+
+Example 1: 
+con1=m.addConstr(x1 + 2*x2 + 3*x3 <= 4)
+con2=m.addConstr(x1 + x2 >= 1)
+
+from internet: 
+model.addConstrs(x.sum(i, '*') <= capacity[i] for i in range(5))
+model.addConstrs(x[i] + x[j] <= 1 for i in range(5) for j in range(5))
+model.addConstrs(x[i]*x[i] + y[i]*y[i] <= 1 for i in range(5))
+model.addConstrs(x.sum(i, '*') == [0, 2] for i in [1, 2, 4])
+model.addConstrs(z[i] == max_(x[i], y[i]) for i in range(5))
+model.addConstrs((x[i] == 1) >> (y[i] + z[i] <= 5) for i in range(5))
+
+
+"""
+
     
 ######## Power balance formula
-
+#mPgrid + Ppv + Pbat_dis == Pdem + Pbat
+m.addConstrs((Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch == Pdem[t]), for t in range (T)) 
         
 ######## Battery SoC dynamics constraint 
 
@@ -85,13 +113,13 @@ Step 3: Add constraints
 Step 4: Set objective function
 """
 
-
+m.setObjective()
 
 """
 Step 5: Solve model
 """
 
-
+m.optimize()
 
 """
 Step 6: Print variables values for optimal solution
