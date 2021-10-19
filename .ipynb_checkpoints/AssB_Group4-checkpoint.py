@@ -69,6 +69,10 @@ Pbat_dis = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pba
 Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
 
 SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
+
+
+######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
+
     
 """
 Step 3: Add constraints
@@ -107,6 +111,7 @@ m.optimize()
 Step 6: Print variables values for optimal solution
 """ 
 ######## Get the values of the decision variables
+
 
 
 
