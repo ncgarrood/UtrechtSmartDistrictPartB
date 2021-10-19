@@ -71,6 +71,9 @@ Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name
 
 SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
 
+
+######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
+
     
 """
 Step 3: Add constraints
@@ -79,13 +82,15 @@ Step 3: Add constraints
    
 ######## Power balance formula
 
+
 m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))
         
+
 ######## Battery SoC dynamics constraint 
 m.addConstrs(SoC[t] == SoC[t-1] + (Pbatmax*Delta_t*eff_ch/C_bat) - (Pbatmax*Delta_t/eff_dis/C_bat) for t in range(T))
 
 ######## SoC constraints 
-
+〖SoC〗_min  ≤〖SoC〗_t≤ 〖SoC〗_max
 
 
 ######## Power boundaries
