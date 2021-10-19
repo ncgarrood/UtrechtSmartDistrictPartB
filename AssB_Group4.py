@@ -14,11 +14,16 @@ import matplotlib.pyplot as plt #for plotting
 """
 Import your input data for the model
 """
-
+summer = pd.read_csv("AssB_Input_Group4_summer.csv")
+winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 
     # dynamic electricity prices vector
     #household's 15-min PV generation vector
     #household's 15-min demand vector
+
+#for now setting up just for summer as thinking when we make it a function can specify summer or winter
+Ppv = summer['PV generation [kW]']
+Pdem = summer['Residential load [kW]']
 
 """
 Parameters value
@@ -26,6 +31,7 @@ Parameters value
 ######## Time-step
 Delta_t = 0.25 # 15 minute (0.25 hour) intervals
 T=24*3*1/Delta_t #number of time-slots (in three days)
+t=np.linspace(1, T, num=int(T)) 
 
 ######## Limits on grid and max, min, and initial SOC
 Pgridmax = 3 #[kW]
@@ -42,21 +48,25 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
-
-
-
+######## other parameters we added, N is number of power sources (note batt_ch and batt_disch as seperate)
+N = 5
 
 """
 Step 1: Create a model
 """
-
+m=gp.Model()
 
 """
 Step 2: Define variables
 """
 ######## Define your decision variables for the time horizon using addVars
  
-    
+Pgrid = m.AddVar(float(-'inf'), float('inf'), 1, gp.GRB.CONTINUOUS, "Pgrid")
+
+Pbat_ch = m.AddVar(0, float('inf'), 1, gp.GRB.CONTINUOUS, "Pbat_ch")
+Pbat_dis = m.AddVar(0, float('inf'), 1, gp.GRB.CONTINUOUS, "Pbat_dis")
+
+SoC = m.AddVar(SoC_min, SoC_max, 1, gp.GRB.CONTINUOUS, "Pbat_ch")
     
  
 """
