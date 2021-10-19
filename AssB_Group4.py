@@ -79,7 +79,7 @@ Step 3: Add constraints
 m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))
         
 ######## Battery SoC dynamics constraint 
-SoC[0] == SoC0
+m.addConstr(SoC[0] == SoC0)
 m.addConstrs(SoC[t] == SoC[t-1] + ((Pbat_ch[t]*Delta_t*eff_ch)/C_bat) - (Pbat_dis[t]*Delta_t)/(eff_dis*C_bat) for t in range(1,T))
 
 
@@ -87,8 +87,8 @@ m.addConstrs(SoC[t] == SoC[t-1] + ((Pbat_ch[t]*Delta_t*eff_ch)/C_bat) - (Pbat_di
 m.addConstrs(SoC_min <= SoC[t] for t in range(T))
 m.addConstrs(SoC_max >= SoC[t] for t in range(T))
 
-######## Power boundaries - not required since specified in upper/lower bounds of variable definitions
-
+######## Power boundaries
+#Pbat_ch[0] = SoC0*C
     
 """
 Step 4: Set objective function
@@ -109,6 +109,11 @@ Step 6: Print variables values for optimal solution
 ######## Get the values of the decision variables
 
 
+summer['Pgrid'] = P=m.getAttr("X", Pgrid).values()
+summer['Pbat_ch'] = P=m.getAttr("X", Pbat_ch).values()
+summer['Pbat_dis'] = P=m.getAttr("X", Pbat_dis).values()
+summer['Pbat'] = summer['Pbat_ch'] - summer['Pbat_dis']
+summer['SoC'] = P=m.getAttr("X", SoC).values()
 
 
 """
@@ -117,6 +122,13 @@ Step 7: Plot optimal power output from each generator
 ######## Plot results
 #f2 = plt.figure(2)
 
+# Plot results
+plot = summer['PV generation [kW]'].plot(kind='line')
+summer.Pgrid.plot(kind='line')
+summer.Pbat.plot(kind='line')
+summer.SoC.plot(kind='line')
+summer['Residential load [kW]'].plot(kind='line')
+plot.legend()
 
 
 
