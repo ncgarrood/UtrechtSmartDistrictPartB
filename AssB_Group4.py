@@ -88,6 +88,7 @@ m.addConstrs(SoC[t] == SoC[t-1] + (Pbatmax*Delta_t*eff_ch/C_bat) - (Pbatmax*Delt
 
 ######## SoC constraints 
 m.addConstrs(SoC_min <= SoC[t] for t in range(T))
+m.addConstrs(SoC_max >= SoC[t] for t in range(T))
 
 ######## Power boundaries   
 m.addConstrs(abs(Pgrid[t]) <= Pgridmax for t in range(T))
@@ -97,6 +98,7 @@ m.addConstrs(Pbat_dis[t] <= Pbatmax for t in range(T))
 """
 Step 4: Set objective function
 """
+obj = 
 
 #m.setObjective()
 
