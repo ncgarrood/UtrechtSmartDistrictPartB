@@ -64,8 +64,8 @@ Step 2: Define variables
 ######## Define your decision variables for the time horizon using addVars
 
 # note one parameter is obj = , we have not set it, not sure what it does
-Pbat_ch = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
-Pbat_dis = m.addVars(T, lb= -Pbatmax, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
+Pbat_ch = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_ch")
+Pbat_dis = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
 
 Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
 
@@ -81,21 +81,18 @@ Step 3: Add constraints
 ######## Nonnegative variables - not required since specified in upper/lower bounds of variable definitions
    
 ######## Power balance formula
-
-
 m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))
         
-
 ######## Battery SoC dynamics constraint 
 m.addConstrs(SoC[t] == SoC[t-1] + (Pbatmax*Delta_t*eff_ch/C_bat) - (Pbatmax*Delta_t/eff_dis/C_bat) for t in range(T))
 
 ######## SoC constraints 
-〖SoC〗_min  ≤〖SoC〗_t≤ 〖SoC〗_max
+m.addConstrs(SoC_min <= SoC[t] for t in range(T))
 
-
-######## Power boundaries
-    
-
+######## Power boundaries   
+m.addConstrs(abs(Pgrid[t]) <= Pgridmax for t in range(T))
+m.addConstrs(Pbat_ch[t] <= Pbatmax for t in range(T))
+m.addConstrs(Pbat_dis[t] <= Pbatmax for t in range(T))
     
 """
 Step 4: Set objective function
