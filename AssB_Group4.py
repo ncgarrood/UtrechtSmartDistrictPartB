@@ -45,7 +45,7 @@ f1 = plt.figure(1)
 
 def get_minimal_cost(season):
     
-    #load either summer or winter data
+    #load either summer or winter input variables
     Ppv = season['PV generation [kW]']
     Pdem = season['Residential load [kW]']
     Celec = season['Electricity price [euro/kWh]']
@@ -72,7 +72,7 @@ def get_minimal_cost(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
     # Set objective function and solve
-    obj = gp.quicksum(Celec[t]*Pgrid[t] for t in range(T))
+    obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
     
@@ -80,10 +80,8 @@ def get_minimal_cost(season):
     season['Pgrid'] = m.getAttr("X", Pgrid).values()
     season['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()
     season['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
-    season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis']
+    season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
     season['SoC'] = m.getAttr("X", SoC).values()
-    
-    return season
 
 get_minimal_cost(summer)
 get_minimal_cost(winter)
