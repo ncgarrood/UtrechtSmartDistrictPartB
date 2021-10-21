@@ -84,15 +84,20 @@ def get_minimal_cost(season):
     m.optimize()
     
     # Add the outcomes to the season dataframe
-    season['Pgrid'] = m.getAttr("X", Pgrid).values()
-    season['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()
-    season['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
-    season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
-    season['SoC'] = m.getAttr("X", SoC).values()
+    df = season.copy()
+    df['Pgrid'] = m.getAttr("X", Pgrid).values()
+    df['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()
+    df['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
+    df['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
+    df['SoC'] = m.getAttr("X", SoC).values()
 
+    emissions = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
+    print('emissions = ' + str(emissions))
+    
+    return df
 
 get_minimal_cost(summer)
-get_minimal_cost(winter)
+#get_minimal_cost(winter)
 
 def get_plots_costs(season1, season2):
 
@@ -112,6 +117,6 @@ def get_plots_costs(season1, season2):
         axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
         axs[1].legend()
          
-get_plots_costs(summer, winter)
+#get_plots_costs(summer, winter)
 
 

@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 21 12:07:19 2021
+Created on Thu Oct 21 16:30:06 2021
 
 @author: NCG
 """
 
-"""
-% Energy in the Built Environment
-% Assignment 2: Optimal Home Energy Management
-% Dr. Tarek AlSkaif
-
-"""
 import gurobipy as gp
 import csv
 import pandas as pd #for csv reading
@@ -47,15 +41,13 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
+######## other parameters too add?
 
 """Question 3 global vairables"""
 
-COST_CONSTRAINTS = list(range(1,11,1))
+EMISSION_CONSTRAINTS = np.linspace(12.115126457034332, -14.45707455, num=10) 
 
-
-"""Question 3 """
-
-def get_minimal_emissions(season):
+def get_minimal_cost(season):
     
     #load either summer or winter input variables
     Ppv = season['PV generation [kW]']
@@ -73,7 +65,7 @@ def get_minimal_emissions(season):
     Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
     
     SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
-        
+
     # Add Constraints  
     ## Power balance formula
     m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))      
@@ -84,43 +76,25 @@ def get_minimal_emissions(season):
     m.addConstrs(SoC_min <= SoC[t] for t in range(T))
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
-    # Set objective function and solve
-    aux = m.addVars(T, lb = 0, ub = Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "aux")
-    m.addConstrs(Pgrid[t] == aux[t] for t in range (T))
-    
-    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T) ) #for the end units to be in euro need to multiply ??? by deltaT
-    m.setObjective(obj, gp.GRB.MINIMIZE)
-    m.optimize()
-    
-    # Add the outcomes to the season dataframe
-    season['Pgrid'] = m.getAttr("X", Pgrid).values()
-    season['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()
-    season['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
-    season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
-    season['SoC'] = m.getAttr("X", SoC).values()
-    
-    cost = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
-    print('cost = ' + str(cost))
+  
 
-get_minimal_emissions(summer)
-#get_minimal_emissions(winter)
-
-def get_plots_emissions(season1, season2):
-
-        fig, axs = plt.subplots(2)
+    ## EMMISSIONS CONSTRAINTS - Q3
+    df = pd.DataFrame(columns = ['Emissions Constraint', 'Cost', 'Emissions'])
+    
+    for i in EMISSION_CONSTRAINTS:
         
-        axs[0].plot(season1['PV generation [kW]'], label = 'Ppv')
-        axs[0].plot(season1.Pgrid, label = 'Pgrid')
-        axs[0].plot(season1.Pbat, label = 'Pbat')
-        axs[0].plot(season1.SoC, label = 'SoC')
-        axs[0].plot(season1['Residential load [kW]'], label = 'Pdem')
-        axs[0].legend()
-        
-        axs[1].plot(season2['PV generation [kW]'], label = 'Ppv')
-        axs[1].plot(season2.Pgrid, label = 'Pgrid')
-        axs[1].plot(season2.Pbat, label = 'Pbat')
-        axs[1].plot(season2.SoC, label = 'SoC')
-        axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
-        axs[1].legend()
+        m.addConstr((gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T))) <= i)
+        print(i)
+        m.setParam('OutputFlag', 0) # dont print all the gurobi output stuff
+        obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
+        m.setObjective(obj, gp.GRB.MINIMIZE)
+        m.optimize()
          
-#get_plots_emissions(summer, winter)
+        #add the values to the new df
+        cost = m.getObjective().getValue()
+        emissions = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
+        df.loc[len(df)] = [i, cost, emissions]
+    
+    return df
+                     
+get_minimal_cost(summer)
