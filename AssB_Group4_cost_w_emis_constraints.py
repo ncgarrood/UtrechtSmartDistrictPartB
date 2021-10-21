@@ -96,4 +96,4 @@ def get_minimal_cost(season):
     
     return df
                      
-winter = get_minimal_cost(winter)
+winter_out_constraints = get_minimal_cost(winter)
