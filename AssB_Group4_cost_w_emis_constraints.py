@@ -95,5 +95,6 @@ def get_minimal_cost(season):
         df.loc[len(df)] = [i, cost, emissions]
     
     return df
-                     
+
+summer_out_constraints = get_minimal_cost(summer)                  
 winter_out_constraints = get_minimal_cost(winter)
