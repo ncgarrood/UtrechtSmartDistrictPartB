@@ -85,10 +85,7 @@ def get_minimal_emissions(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
     # Set objective function and solve
-    aux = m.addVars(T, lb = 0, ub = Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "aux")
-    m.addConstrs(Pgrid[t] == aux[t] for t in range (T))
-    
-    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T) ) #for the end units to be in euro need to multiply ??? by deltaT
+    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply ??? by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
     
@@ -108,19 +105,22 @@ get_minimal_emissions(summer)
 def get_plots_emissions(season1, season2):
 
         fig, axs = plt.subplots(2)
+        fig.tight_layout()
         
         axs[0].plot(season1['PV generation [kW]'], label = 'Ppv')
         axs[0].plot(season1.Pgrid, label = 'Pgrid')
         axs[0].plot(season1.Pbat, label = 'Pbat')
         axs[0].plot(season1.SoC, label = 'SoC')
         axs[0].plot(season1['Residential load [kW]'], label = 'Pdem')
-        axs[0].legend()
+        axs[0].legend(loc='upper right')
+        axs[0].set(ylabel='Power (kW)', title='Summer')
         
         axs[1].plot(season2['PV generation [kW]'], label = 'Ppv')
         axs[1].plot(season2.Pgrid, label = 'Pgrid')
         axs[1].plot(season2.Pbat, label = 'Pbat')
         axs[1].plot(season2.SoC, label = 'SoC')
         axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
-        axs[1].legend()
+        axs[1].legend(loc='upper right')
+        axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
          
 #get_plots_emissions(summer, winter)
