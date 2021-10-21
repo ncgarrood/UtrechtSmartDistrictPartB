@@ -125,4 +125,4 @@ def get_plots_emissions(season1, season2):
         axs[1].legend(loc='upper right')
         axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
          
-#get_plots_emissions(summer, winter)
+get_plots_emissions(summer, winter)
