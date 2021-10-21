@@ -95,9 +95,12 @@ def get_minimal_emissions(season):
     season['Pbat_dis'] = m.getAttr("X", Pbat_dis).values()
     season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
     season['SoC'] = m.getAttr("X", SoC).values()
+    
+    cost = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
+    print('cost = ' + str(cost))
 
 get_minimal_emissions(summer)
-get_minimal_emissions(winter)
+#get_minimal_emissions(winter)
 
 def get_plots_emissions(season1, season2):
 
@@ -120,4 +123,4 @@ def get_plots_emissions(season1, season2):
         axs[1].legend(loc='upper right')
         axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
          
-get_plots_emissions(summer, winter)
+#get_plots_emissions(summer, winter)
