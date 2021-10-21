@@ -48,6 +48,11 @@ eff_ch = 0.94 #battery charging efficeicny
 f1 = plt.figure(1)
 
 
+"""Question 3 global vairables"""
+
+COST_CONSTRAINTS = list(range(1,11,1))
+
+
 """Question 3 """
 
 def get_minimal_emissions(season):
@@ -101,16 +106,18 @@ def get_plots_emissions(season1, season2):
 
         fig, axs = plt.subplots(2)
         
-        axs[0].plot(season1['PV generation [kW]'])
-        axs[0].plot(season1.Pgrid)
-        axs[0].plot(season1.Pbat)
-        axs[0].plot(season1.SoC)
-        axs[0].plot(season1['Residential load [kW]'])
+        axs[0].plot(season1['PV generation [kW]'], label = 'Ppv')
+        axs[0].plot(season1.Pgrid, label = 'Pgrid')
+        axs[0].plot(season1.Pbat, label = 'Pbat')
+        axs[0].plot(season1.SoC, label = 'SoC')
+        axs[0].plot(season1['Residential load [kW]'], label = 'Pdem')
+        axs[0].legend()
         
-        axs[1].plot(season2['PV generation [kW]'])
-        axs[1].plot(season2.Pgrid)
-        axs[1].plot(season2.Pbat)
-        axs[1].plot(season2.SoC)
-        axs[1].plot(season2['Residential load [kW]'])
+        axs[1].plot(season2['PV generation [kW]'], label = 'Ppv')
+        axs[1].plot(season2.Pgrid, label = 'Pgrid')
+        axs[1].plot(season2.Pbat, label = 'Pbat')
+        axs[1].plot(season2.SoC, label = 'SoC')
+        axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
+        axs[1].legend()
          
 get_plots_emissions(summer, winter)
