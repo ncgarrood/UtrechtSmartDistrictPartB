@@ -76,7 +76,6 @@ def get_minimal_cost(season):
     m.addConstrs(SoC_min <= SoC[t] for t in range(T))
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
-  
 
     ## EMMISSIONS CONSTRAINTS - Q3
     df = pd.DataFrame(columns = ['Emissions Constraint', 'Cost', 'Emissions'])
@@ -97,4 +96,4 @@ def get_minimal_cost(season):
     
     return df
                      
-get_minimal_cost(summer)
+winter = get_minimal_cost(winter)

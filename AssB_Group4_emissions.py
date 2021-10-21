@@ -98,9 +98,11 @@ def get_minimal_emissions(season):
     
     cost = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
     print('cost = ' + str(cost))
+    
+    return season
 
-get_minimal_emissions(summer)
-#get_minimal_emissions(winter)
+summer_out_emismin = get_minimal_emissions(summer)
+winter_out_emismin = get_minimal_emissions(winter)
 
 def get_plots_emissions(season1, season2):
 
