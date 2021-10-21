@@ -53,6 +53,7 @@ def get_minimal_cost(season):
     Ppv = season['PV generation [kW]']
     Pdem = season['Residential load [kW]']
     Celec = season['Electricity price [euro/kWh]']
+    Emis = season['Marginal emission factor [kg CO2eq/kWh]']
     
     # Create Model
     m=gp.Model()
