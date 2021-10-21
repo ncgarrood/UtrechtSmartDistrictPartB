@@ -85,10 +85,7 @@ def get_minimal_emissions(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
     # Set objective function and solve
-    aux = m.addVars(T, lb = 0, ub = Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "aux")
-    m.addConstrs(Pgrid[t] == aux[t] for t in range (T))
-    
-    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T) ) #for the end units to be in euro need to multiply ??? by deltaT
+    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply ??? by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
     
