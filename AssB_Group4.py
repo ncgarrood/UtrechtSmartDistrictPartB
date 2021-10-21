@@ -98,20 +98,23 @@ get_minimal_cost(winter)
 def get_plots_costs(season1, season2):
 
         fig, axs = plt.subplots(2)
+        fig.tight_layout()
         
         axs[0].plot(season1['PV generation [kW]'], label = 'Ppv')
         axs[0].plot(season1.Pgrid, label = 'Pgrid')
         axs[0].plot(season1.Pbat, label = 'Pbat')
         axs[0].plot(season1.SoC, label = 'SoC')
         axs[0].plot(season1['Residential load [kW]'], label = 'Pdem')
-        axs[0].legend()
+        axs[0].legend(loc='upper right')
+        axs[0].set(ylabel='Power (kW)', title='Summer')
         
         axs[1].plot(season2['PV generation [kW]'], label = 'Ppv')
         axs[1].plot(season2.Pgrid, label = 'Pgrid')
         axs[1].plot(season2.Pbat, label = 'Pbat')
         axs[1].plot(season2.SoC, label = 'SoC')
         axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
-        axs[1].legend()
+        axs[1].legend(loc='upper right')
+        axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
          
 get_plots_costs(summer, winter)
 
