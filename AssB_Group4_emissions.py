@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Oct 21 12:07:19 2021
+
+@author: NCG
+"""
+
+"""
 % Energy in the Built Environment
 % Assignment 2: Optimal Home Energy Management
 % Dr. Tarek AlSkaif
@@ -41,14 +47,16 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
-######## other parameters too add?
 
-def get_minimal_cost(season):
+"""Question 3 """
+
+def get_minimal_emissions(season):
     
     #load either summer or winter input variables
     Ppv = season['PV generation [kW]']
     Pdem = season['Residential load [kW]']
     Celec = season['Electricity price [euro/kWh]']
+    Emis = season['Marginal emission factor [kg CO2eq/kWh]']
     
     # Create Model
     m=gp.Model()
@@ -72,7 +80,10 @@ def get_minimal_cost(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
     # Set objective function and solve
-    obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
+    aux = m.addVars(T, lb = 0, ub = Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "aux")
+    m.addConstrs(Pgrid[t] == aux[t] for t in range (T))
+    
+    obj = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T) ) #for the end units to be in euro need to multiply ??? by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
     
@@ -83,10 +94,10 @@ def get_minimal_cost(season):
     season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
     season['SoC'] = m.getAttr("X", SoC).values()
 
-get_minimal_cost(summer)
-get_minimal_cost(winter)
+get_minimal_emissions(summer)
+get_minimal_emissions(winter)
 
-def get_plots_costs(season1, season2):
+def get_plots_emissions(season1, season2):
 
         fig, axs = plt.subplots(2)
         
@@ -102,6 +113,4 @@ def get_plots_costs(season1, season2):
         axs[1].plot(season2.SoC)
         axs[1].plot(season2['Residential load [kW]'])
          
-get_plots_costs(summer, winter)
-
-
+get_plots_emissions(summer, winter)
