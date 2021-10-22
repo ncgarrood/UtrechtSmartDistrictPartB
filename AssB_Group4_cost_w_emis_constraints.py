@@ -18,8 +18,6 @@ Import your input data for the model
 summer = pd.read_csv("AssB_Input_Group4_summer.csv")
 winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 
-#for now setting up just for summer as thinking when we make it a function can specify summer or winter
-
 """
 Parameters value
 """
@@ -42,14 +40,12 @@ eff_ch = 0.94 #battery charging efficeicny
 ######## Plot power demand and PV generation data
 f1 = plt.figure(1)
 
-######## other parameters too add?
 
 """Question 3 global vairables"""
-
 EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.115126457034332, -14.45707455, num=10) 
-EMISSION_CONSTRAINTS_WINTER = np.linspace(25, 10, num=10) 
+EMISSION_CONSTRAINTS_WINTER = np.linspace(26.083103268823546, -0.02090155335, num=10) 
 
-def get_minimal_cost(season, season2):
+def get_minimal_cost(season):
     
     #load either summer or winter input variables
     Ppv = season['PV generation [kW]']
@@ -80,9 +76,9 @@ def get_minimal_cost(season, season2):
     
 
     ## EMMISSIONS CONSTRAINTS - Q3
-    if season2 == 'summer':
+    if season["End date/time"][0] == '07/07/2018 00:15':
         emissionlist = EMISSION_CONSTRAINTS_SUMMER
-    elif season2 == 'winter':
+    elif season["End date/time"][0] == '2018-01-21 00:15:00':
         emissionlist = EMISSION_CONSTRAINTS_WINTER
     else:
         raise Exception('whoops') 
@@ -93,7 +89,7 @@ def get_minimal_cost(season, season2):
         
         m.addConstr((gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T))) <= i)
         
-        m.setParam('OutputFlag', 0) # dont print all the gurobi output stuff
+        #m.setParam('OutputFlag', 0) # dont print all the gurobi output stuff
         obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
         m.setObjective(obj, gp.GRB.MINIMIZE)
         m.optimize()
@@ -105,14 +101,16 @@ def get_minimal_cost(season, season2):
     
     return df
 
-summer_out_constraints = get_minimal_cost(summer, 'summer')                  
-winter_out_constraints = get_minimal_cost(winter, 'winter')
+summer_out_constraints = get_minimal_cost(summer)                  
+winter_out_constraints = get_minimal_cost(winter)
 
 ParetoDataFrame = pd.DataFrame(columns = ['summercost', 'summeremiss', 'wintercost', 'winteremiss'])
 ParetoDataFrame.summercost = summer_out_constraints['Cost']
 ParetoDataFrame.summeremiss = summer_out_constraints['Emissions']
 ParetoDataFrame.wintercost = winter_out_constraints['Cost']
 ParetoDataFrame.winteremiss = winter_out_constraints['Emissions']
+
+ParetoDataFrame
 
 ParetoDataFrame.summercost = ParetoDataFrame.summercost/(summer['Residential load [kW]'].sum()/4)
 ParetoDataFrame.summeremiss = ParetoDataFrame.summeremiss/(summer['Residential load [kW]'].sum()/4)
