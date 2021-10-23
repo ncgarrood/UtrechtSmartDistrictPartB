@@ -120,8 +120,8 @@ ParetoDataFrame.wintercost = ParetoDataFrame.wintercost/(winter['Residential loa
 ParetoDataFrame.winteremiss = ParetoDataFrame.winteremiss/(winter['Residential load [kW]'].sum()/4)
 
 fig = plt.figure()
-plt.plot(ParetoDataFrame.summeremiss, ParetoDataFrame.summercost, label = 'summer')
-plt.plot(ParetoDataFrame.winteremiss, ParetoDataFrame.wintercost, label = 'winter')
+plt.plot(ParetoDataFrame.summeremiss, ParetoDataFrame.summercost, marker = 'o', label = 'summer')
+plt.plot(ParetoDataFrame.winteremiss, ParetoDataFrame.wintercost, marker = 'o', label = 'winter')
 plt.legend(loc='center right')
 plt.grid()
 plt.rc('grid', linestyle="-", color='black')
