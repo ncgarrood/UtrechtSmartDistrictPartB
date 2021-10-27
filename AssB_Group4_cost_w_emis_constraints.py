@@ -110,8 +110,6 @@ ParetoDataFrame.summeremiss = summer_out_constraints['Emissions']
 ParetoDataFrame.wintercost = winter_out_constraints['Cost']
 ParetoDataFrame.winteremiss = winter_out_constraints['Emissions']
 
-ParetoDataFrame
-
 ParetoDataFrame.summercost = ParetoDataFrame.summercost/(summer['Residential load [kW]'].sum()/4)
 ParetoDataFrame.summeremiss = ParetoDataFrame.summeremiss/(summer['Residential load [kW]'].sum()/4)
 ParetoDataFrame.wintercost = ParetoDataFrame.wintercost/(winter['Residential load [kW]'].sum()/4)
@@ -123,6 +121,10 @@ plt.plot(ParetoDataFrame.winteremiss, ParetoDataFrame.wintercost, marker = 'o', 
 plt.legend(loc='center right')
 plt.grid()
 plt.rc('grid', linestyle="-", color='black')
-fig.suptitle('Pareto frontier for charging emissions versus costs (summer and winter)')
-plt.xlabel('Charging emissions [kg CO2-eq/kWh]') 
+plt.xlabel('Charging emissions [kg $CO_2$-eq/kWh]') 
+plt.grid(False)
 plt.ylabel('Charging costs [€/kWh]')
+
+
+rEMISSION_CONSTRAINTS_SUMMER = EMISSION_CONSTRAINTS_SUMMER.round(3)
+rEMISSION_CONSTRAINTS_WINTER = EMISSION_CONSTRAINTS_WINTER.round(3)

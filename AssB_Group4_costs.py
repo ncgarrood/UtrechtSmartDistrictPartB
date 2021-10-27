@@ -105,25 +105,26 @@ winter_out_costmin = get_minimal_cost(winter)
 def get_plots_costs(season1, season2):
 
         fig, axs = plt.subplots(2)
+        
+        plt.locator_params(nbins=3)
 
         fig.tight_layout()
-
         
-        axs[0].plot(season1['PV generation [kW]'], label = 'Ppv')
-        axs[0].plot(season1.Pgrid, label = 'Pgrid')
-        axs[0].plot(season1.Pbat, label = 'Pbat')
+        axs[0].plot(season1['PV generation [kW]'], label = '$P_{pv}$')
+        axs[0].plot(season1.Pgrid, label = '$P_{grid}$')
+        axs[0].plot(season1.Pbat, label = '$P_{bat}$')
         axs[0].plot(season1.SoC, label = 'SoC')
-        axs[0].plot(season1['Residential load [kW]'], label = 'Pdem')
-
+        axs[0].plot(season1['Residential load [kW]'], label = '$P_{dem}$')
+        
         axs[0].legend(loc='upper right', bbox_to_anchor=(1.2,1))
         axs[0].set(ylabel='Power (kW)', title='Summer')
-
         
-        axs[1].plot(season2['PV generation [kW]'], label = 'Ppv')
-        axs[1].plot(season2.Pgrid, label = 'Pgrid')
-        axs[1].plot(season2.Pbat, label = 'Pbat')
+
+        axs[1].plot(season2['PV generation [kW]'], label = '$P_{pv}$')
+        axs[1].plot(season2.Pgrid, label = '$P_{grid}$')
+        axs[1].plot(season2.Pbat, label = '$P_{bat}$')
         axs[1].plot(season2.SoC, label = 'SoC')
-        axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
+        axs[1].plot(season2['Residential load [kW]'], label = '$P_{dem}$')
 
         axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
         axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
