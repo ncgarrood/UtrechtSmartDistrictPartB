@@ -123,7 +123,7 @@ def get_plots_emissions(season1, season2):
         axs[1].plot(season2.SoC, label = 'SoC')
         axs[1].plot(season2['Residential load [kW]'], label = 'Pdem')
         axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
+        axs[1].set(ylabel='Power (kW)',xlabel='Time (hours/4)', title='Winter')
          
 get_plots_emissions(summer_out_emismin, winter_out_emismin)
 

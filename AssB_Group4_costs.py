@@ -127,7 +127,7 @@ def get_plots_costs(season1, season2):
         axs[1].plot(season2['Residential load [kW]'], label = '$P_{dem}$')
 
         axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[1].set(ylabel='Power (kW)',xlabel='Time (h/4)', title='Winter')
+        axs[1].set(ylabel='Power (kW)',xlabel='Time (hours/4)', title='Winter')
          
 get_plots_costs(summer_out_costmin, winter_out_costmin)
 

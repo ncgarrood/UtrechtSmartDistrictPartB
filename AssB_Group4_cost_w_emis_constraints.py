@@ -118,7 +118,7 @@ ParetoDataFrame.winteremiss = ParetoDataFrame.winteremiss/(winter['Residential l
 fig = plt.figure()
 plt.plot(ParetoDataFrame.summeremiss, ParetoDataFrame.summercost, marker = 'o', label = 'summer')
 plt.plot(ParetoDataFrame.winteremiss, ParetoDataFrame.wintercost, marker = 'o', label = 'winter')
-plt.legend(loc='center right')
+plt.legend(loc='center right', bbox_to_anchor=(1,0.9))
 plt.grid()
 plt.rc('grid', linestyle="-", color='black')
 plt.xlabel('Charging emissions [kg $CO_2$-eq/kWh]') 
