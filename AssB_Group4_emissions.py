@@ -44,16 +44,8 @@ C_bat = 13.5 #battery capacity parameter for a Tesla Powerwall rated at 13,5 [kW
 eff_dis = 0.94 #battery discharging efficeicny
 eff_ch = 0.94 #battery charging efficeicny
 
-######## Plot power demand and PV generation data
-f1 = plt.figure(1)
 
-
-"""Question 3 global vairables"""
-
-COST_CONSTRAINTS = list(range(1,11,1))
-
-
-"""Question 3 """
+"""Question 3 - getting minimum emissions in order to set up Parerto """
 
 def get_minimal_emissions(season):
     
@@ -125,5 +117,5 @@ def get_plots_emissions(season1, season2):
         axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
         axs[1].set(ylabel='Power (kW)',xlabel='Time (hours/4)', title='Winter')
          
-get_plots_emissions(summer_out_emismin, winter_out_emismin)
+#get_plots_emissions(summer_out_emismin, winter_out_emismin)
 

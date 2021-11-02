@@ -42,8 +42,8 @@ f1 = plt.figure(1)
 
 
 """Question 3 global vairables"""
-EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.889924867969496, -14.35135121, num=10) 
-EMISSION_CONSTRAINTS_WINTER = np.linspace(26.776254443847375, 1.4560084023241582, num=10) 
+EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.889924867969496, -1.435135121e+01, num=10) 
+EMISSION_CONSTRAINTS_WINTER = np.linspace(26.776254443847375, 6.722496217e-01, num=10) 
 
 def get_minimal_cost(season):
     
@@ -119,6 +119,7 @@ plt.rc('grid', linestyle="-", color='black')
 plt.xlabel('Emissions [kg $CO_2$-eq]') 
 plt.grid(False)
 plt.ylabel('Costs [€]')
+plt.ylim(-0.75,1.5,0.25)
 
 
 rEMISSION_CONSTRAINTS_SUMMER = EMISSION_CONSTRAINTS_SUMMER.round(3)
