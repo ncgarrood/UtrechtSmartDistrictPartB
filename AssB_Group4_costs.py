@@ -97,7 +97,7 @@ def get_minimal_cost(season):
 summer_out_costmin = get_minimal_cost(summer)
 winter_out_costmin = get_minimal_cost(winter)
 
-
+#%%
 def get_plots_Pbat_Pgrid_elecprice(season1, season2):
 
         fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True)
@@ -141,6 +141,10 @@ def get_plots_Pbat_Pgrid_elecprice(season1, season2):
         
 get_plots_Pbat_Pgrid_elecprice(summer_out_costmin, winter_out_costmin)
 
+max_pbat_row = winter_out_costmin.iloc[winter_out_costmin['Pbat_dis'].idxmax(axis=0)]
+print(max_pbat_row)
+max_grid =  summer_out_costmin.iloc[summer_out_costmin['Pgrid'].idxmin(axis=0)]
+print(max_grid)
 #%%
 
 def get_plots_SOC(season1,season2):
@@ -167,17 +171,17 @@ def get_plots_pv_dem(season1, season2):
        
         fig.tight_layout()
             
-        axs[0].plot(season1['PV generation [kW]'], label = '$P_{pv}$')
-        axs[0].plot(season1['Residential load [kW]'], label = '$P_{dem}$')
+        axs[0].plot(season1['PV generation [kW]'], label = 'PV Generation')
+        axs[0].plot(season1['Residential load [kW]'], label = 'Household Demand')
  
-        axs[0].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[0].set(ylabel=' (Power [kW]', xlabel='', title='Summer')
+        axs[0].legend(loc='upper right', bbox_to_anchor=(1.4,1))
+        axs[0].set(ylabel='Power [kW]', xlabel='', title='Summer')
         
 
-        axs[1].plot(season2['PV generation [kW]'], label = '$P_{pv}$')
-        axs[1].plot(season2['Residential load [kW]'], label = '$P_{dem}$')
+        axs[1].plot(season2['PV generation [kW]'], label = 'PV Generation')
+        axs[1].plot(season2['Residential load [kW]'], label = 'Household Demand')
         
-        axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
+        axs[1].legend(loc='upper right', bbox_to_anchor=(1.4,1))
         axs[1].set(ylabel='Power [kW]', xlabel='Time [hour]', title='Winter')
           
 get_plots_pv_dem(summer_out_costmin, winter_out_costmin)
