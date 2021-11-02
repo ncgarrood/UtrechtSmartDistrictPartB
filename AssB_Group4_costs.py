@@ -78,14 +78,12 @@ def get_minimal_cost(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
      ## EMMISSIONS CONSTRAINTS - Q3
-     
     
     # Set objective function and solve
     obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
     
-    # Add the outcomes to the season dataframe
     # Add the outcomes to the season dataframe
     season['Pgrid'] = m.getAttr("X", Pgrid).values()
     season['Pbat_ch'] = m.getAttr("X", Pbat_ch).values()

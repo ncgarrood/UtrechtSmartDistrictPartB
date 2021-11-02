@@ -42,8 +42,8 @@ f1 = plt.figure(1)
 
 
 """Question 3 global vairables"""
-EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.115126457034332, -14.45707455, num=10) 
-EMISSION_CONSTRAINTS_WINTER = np.linspace(26.083103268823546, -0.02090155335, num=10) 
+EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.889924867969496, -14.35135121, num=10) 
+EMISSION_CONSTRAINTS_WINTER = np.linspace(26.776254443847375, 1.4560084023241582, num=10) 
 
 def get_minimal_cost(season):
     
@@ -110,20 +110,15 @@ ParetoDataFrame.summeremiss = summer_out_constraints['Emissions']
 ParetoDataFrame.wintercost = winter_out_constraints['Cost']
 ParetoDataFrame.winteremiss = winter_out_constraints['Emissions']
 
-ParetoDataFrame.summercost = ParetoDataFrame.summercost/(summer['Residential load [kW]'].sum()/4)
-ParetoDataFrame.summeremiss = ParetoDataFrame.summeremiss/(summer['Residential load [kW]'].sum()/4)
-ParetoDataFrame.wintercost = ParetoDataFrame.wintercost/(winter['Residential load [kW]'].sum()/4)
-ParetoDataFrame.winteremiss = ParetoDataFrame.winteremiss/(winter['Residential load [kW]'].sum()/4)
-
 fig = plt.figure()
 plt.plot(ParetoDataFrame.summeremiss, ParetoDataFrame.summercost, marker = 'o', label = 'summer')
 plt.plot(ParetoDataFrame.winteremiss, ParetoDataFrame.wintercost, marker = 'o', label = 'winter')
 plt.legend(loc='center right', bbox_to_anchor=(1,0.9))
 plt.grid()
 plt.rc('grid', linestyle="-", color='black')
-plt.xlabel('Charging emissions [kg $CO_2$-eq/kWh]') 
+plt.xlabel('Emissions [kg $CO_2$-eq]') 
 plt.grid(False)
-plt.ylabel('Charging costs [€/kWh]')
+plt.ylabel('Costs [€]')
 
 
 rEMISSION_CONSTRAINTS_SUMMER = EMISSION_CONSTRAINTS_SUMMER.round(3)
