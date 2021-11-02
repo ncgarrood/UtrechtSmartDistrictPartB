@@ -71,7 +71,7 @@ def get_minimal_cost(season):
     ## Power balance formula
     m.addConstrs(Pgrid[t] + Ppv[t] + Pbat_dis[t] - Pbat_ch[t] == Pdem[t] for t in range(T))      
     ## Battery SoC dynamics constraint 
-    m.addConstr(SoC[0] == SoC0)
+    m.addConstr(SoC[0] == SoC0 + ((Pbat_ch[0]*Delta_t*eff_ch)/C_bat) - (Pbat_dis[0]*Delta_t)/(eff_dis*C_bat))
     m.addConstrs(SoC[t] == SoC[t-1] + ((Pbat_ch[t]*Delta_t*eff_ch)/C_bat) - (Pbat_dis[t]*Delta_t)/(eff_dis*C_bat) for t in range(1,T))
     ## SoC constraints 
     m.addConstrs(SoC_min <= SoC[t] for t in range(T))
