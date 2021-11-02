@@ -98,30 +98,66 @@ summer_out_costmin = get_minimal_cost(summer)
 winter_out_costmin = get_minimal_cost(winter)
 
 
-def get_plots_grid_bat(season1, season2):
+def get_plots_Pbat_Pgrid_elecprice(season1, season2):
 
-        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True,)
-        xlabels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
-        plt.xticks(np.arange(289, step=48), xlabels)
+        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True)
+        labels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
+        plt.xticks(np.arange(289, step=48), labels)
         plt.ylim(-4,4)
         plt.yticks(np.arange(-4, 5, 1.0))
        
-        #fig.tight_layout()
-            
-        axs[0].plot(season1.Pgrid, label = '$P_{grid}$')
-        axs[0].plot(season1.Pbat, label = '$P_{bat}$')
- 
-        axs[0].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[0].set(ylabel='Power [kW]', xlabel='', title='Summer')
+        fig.tight_layout()
         
-        axs[1].plot(season2.Pgrid, label = '$P_{grid}$')
-        axs[1].plot(season2.Pbat, label = '$P_{bat}$')
-        
-        axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[1].set(ylabel='Power [kW]', xlabel='Time [hour]', title='Winter')
-          
-get_plots_grid_bat(summer_out_costmin, winter_out_costmin)
+        plot1 = axs[0].plot(season1.Pbat, label = 'Battery Power', color = 'C0')
+        plot2 = axs[0].plot(season1.Pgrid, label = 'Grid Power', color = 'C2')
+        axs[0].set(xlabel='', title='Summer')
+        axs[0].set_ylabel('Power [kW]')
 
+        ax0t = axs[0].twinx()
+        plot3 = ax0t.plot(season1['Electricity price [euro/kWh]'], label = 'Electricity Price', color ='C1')
+        ax0t.set_ylabel('Electricity price [€/kWh]')
+
+        
+        allplots = plot1 + plot2 + plot3
+        labels2 = [plot.get_label() for plot in allplots]
+        ax0t.legend(allplots, labels2, bbox_to_anchor=(
+            1.12, 1), loc='upper left')
+        
+        plot4 = axs[1].plot(season2.Pbat, label = 'Battery Power', color = 'C0')
+        plot5 = axs[1].plot(season2.Pgrid, label = 'Grid Power', color = 'C2')
+        axs[1].set(xlabel='', title='Winter')
+        axs[1].set_ylabel('Power [kW]')
+
+        ax1t = axs[1].twinx()
+        plot6 = ax1t.plot(season2['Electricity price [euro/kWh]'], label = 'Electricity Price', color ='C1')
+        ax1t.set_ylabel('Electricity price [€/kWh]')
+
+        allplots2 = plot4 + plot5 + plot6
+        labels3 = [plot.get_label() for plot in allplots2]
+        ax1t.legend(allplots2, labels3, bbox_to_anchor=(
+            1.12, 1), loc='upper left')
+         
+        axs[1].set_xlabel('Time (hours)')
+        
+get_plots_Pbat_Pgrid_elecprice(summer_out_costmin, winter_out_costmin)
+
+#%%
+
+def get_plots_SOC(season1,season2):
+    
+    fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True,)
+    xlabels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
+    plt.xticks(np.arange(289, step=48), xlabels)
+
+   
+    #fig.tight_layout()
+        
+    axs[0].plot(season1.SoC, label = 'SoC')
+    axs[0].set(ylabel='SoC', xlabel='', title='Summer')
+    axs[1].plot(season2.SoC, label = 'SoC')
+    axs[1].set(ylabel='SoC', xlabel='Time [hour]', title='Winter')
+          
+get_plots_SOC(summer_out_costmin, winter_out_costmin)
 
 def get_plots_pv_dem(season1, season2):
 
@@ -145,40 +181,3 @@ def get_plots_pv_dem(season1, season2):
         axs[1].set(ylabel='Power [kW]', xlabel='Time [hour]', title='Winter')
           
 get_plots_pv_dem(summer_out_costmin, winter_out_costmin)
-
-
-def get_plots_Pbat_elecprice(season1, season2):
-
-        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True)
-        labels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
-        plt.xticks(np.arange(289, step=48), labels)
-        plt.ylim(-4,4)
-        plt.yticks(np.arange(-4, 5, 1.0))
-       
-        fig.tight_layout()
-        
-        axs[0].plot(season1.Pbat, label = '$P_{bat}$', color = 'blue')
-        axs[0].set(xlabel='', title='Summer')
-        axs[0].set_ylabel('$P_{bat}$ [kW]', color = 'blue')
-        axs[0].tick_params(axis='y', labelcolor='blue')
-
-        ax0t = axs[0].twinx()
-        ax0t.plot(season1['Electricity price [euro/kWh]'], color ='green')
-        ax0t.set_ylabel('Electricity price [€/kWh]', color = 'green')
-        ax0t.tick_params(axis='y', labelcolor='green')
-        
-
-        axs[1].plot(season2.Pbat, label = '$P_{bat}$', color = 'blue')
-        axs[1].set(xlabel='', title='Winter')
-        axs[1].set_ylabel('$P_{bat}$ [kW]', color = 'blue')
-        axs[1].tick_params(axis='y', labelcolor='blue')
-
-        ax1t = axs[1].twinx()
-        ax1t.plot(season2['Electricity price [euro/kWh]'], color ='green')
-        ax1t.set_ylabel('Electricity price [€/kWh]', color = 'green')
-        ax1t.tick_params(axis='y', labelcolor='green')
-         
-        axs[1].set_xlabel('Time (hours)')
-        
-get_plots_Pbat_elecprice(summer_out_costmin, winter_out_costmin)
-
