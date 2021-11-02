@@ -38,8 +38,6 @@ C_bat = 13.5 #battery capacity parameter for a Tesla Powerwall rated at 13,5 [kW
 eff_dis = 0.94 #battery discharging efficeicny
 eff_ch = 0.94 #battery charging efficeicny
 
-######## Plot power demand and PV generation data
-f1 = plt.figure(1)
 
 ######## other parameters too add?
 
@@ -100,34 +98,85 @@ summer_out_costmin = get_minimal_cost(summer)
 winter_out_costmin = get_minimal_cost(winter)
 
 
-def get_plots_costs(season1, season2):
+def get_plots_grid_bat(season1, season2):
 
-        fig, axs = plt.subplots(2)
-        
-        plt.locator_params(nbins=3)
-
-        fig.tight_layout()
-        
-        axs[0].plot(season1['PV generation [kW]'], label = '$P_{pv}$')
+        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True,)
+        xlabels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
+        plt.xticks(np.arange(289, step=48), xlabels)
+        plt.ylim(-4,4)
+        plt.yticks(np.arange(-4, 5, 1.0))
+       
+        #fig.tight_layout()
+            
         axs[0].plot(season1.Pgrid, label = '$P_{grid}$')
         axs[0].plot(season1.Pbat, label = '$P_{bat}$')
-        axs[0].plot(season1.SoC, label = 'SoC')
-        axs[0].plot(season1['Residential load [kW]'], label = '$P_{dem}$')
-        
+ 
         axs[0].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[0].set(ylabel='Power (kW)', title='Summer')
+        axs[0].set(ylabel='Power (kW)', xlabel='', title='Summer')
+        
+        axs[1].plot(season2.Pgrid, label = '$P_{grid}$')
+        axs[1].plot(season2.Pbat, label = '$P_{bat}$')
+        
+        axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
+        axs[1].set(ylabel='Power (kW)', xlabel='Time (hour)', title='Winter')
+          
+get_plots_grid_bat(summer_out_costmin, winter_out_costmin)
+
+
+def get_plots_pv_dem(season1, season2):
+
+        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True,)
+        xlabels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
+        plt.xticks(np.arange(289, step=48), xlabels)
+       
+        fig.tight_layout()
+            
+        axs[0].plot(season1['PV generation [kW]'], label = '$P_{pv}$')
+        axs[0].plot(season1['Residential load [kW]'], label = '$P_{dem}$')
+ 
+        axs[0].legend(loc='upper right', bbox_to_anchor=(1.2,1))
+        axs[0].set(ylabel='Power (kW)', xlabel='', title='Summer')
         
 
         axs[1].plot(season2['PV generation [kW]'], label = '$P_{pv}$')
-        axs[1].plot(season2.Pgrid, label = '$P_{grid}$')
-        axs[1].plot(season2.Pbat, label = '$P_{bat}$')
-        axs[1].plot(season2.SoC, label = 'SoC')
         axs[1].plot(season2['Residential load [kW]'], label = '$P_{dem}$')
-
+        
         axs[1].legend(loc='upper right', bbox_to_anchor=(1.2,1))
-        axs[1].set(ylabel='Power (kW)',xlabel='Time (hours/4)', title='Winter')
+        axs[1].set(ylabel='Power (kW)', xlabel='Time (hours)', title='Winter')
+          
+get_plots_pv_dem(summer_out_costmin, winter_out_costmin)
+
+#%% 
+def get_plots_SOC_elecprice(season1, season2):
+
+        fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True)
+        labels = ['0:00', '12:00', '0:00', '12:00', '0:00', '12:00', '00:00']
+        plt.xticks(np.arange(289, step=48), labels)
+       
+        fig.tight_layout()
+        
+        axs[0].plot(season1.SoC, label = 'SoC', color = 'blue')
+        axs[0].set(xlabel='', title='Summer')
+        axs[0].set_ylabel('SoC', color = 'blue')
+        axs[0].tick_params(axis='y', labelcolor='blue')
+
+        ax0t = axs[0].twinx()
+        ax0t.plot(season1['Electricity price [euro/kWh]'], color ='green')
+        ax0t.set_ylabel('Electricity price [€/kWh]', color = 'green')
+        ax0t.tick_params(axis='y', labelcolor='green')
+        
+
+        axs[1].plot(season2.SoC, label = 'SoC', color = 'blue')
+        axs[1].set(xlabel='', title='Winter')
+        axs[1].set_ylabel('SoC', color = 'blue')
+        axs[1].tick_params(axis='y', labelcolor='blue')
+
+        ax1t = axs[1].twinx()
+        ax1t.plot(season2['Electricity price [euro/kWh]'], color ='green')
+        ax1t.set_ylabel('Electricity price [€/kWh]', color = 'green')
+        ax1t.tick_params(axis='y', labelcolor='green')
          
-get_plots_costs(summer_out_costmin, winter_out_costmin)
-
-
+        axs[1].set_xlabel('Time (hours)')
+        
+get_plots_SOC_elecprice(summer_out_costmin, winter_out_costmin)
 
