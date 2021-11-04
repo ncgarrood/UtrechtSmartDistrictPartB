@@ -23,8 +23,6 @@ Import your input data for the model
 summer = pd.read_csv("AssB_Input_Group4_summer.csv")
 winter = pd.read_csv("AssB_Input_Group4_winter.csv")
 
-#for now setting up just for summer as thinking when we make it a function can specify summer or winter
-
 """
 Parameters value
 """

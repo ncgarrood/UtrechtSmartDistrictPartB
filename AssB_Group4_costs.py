@@ -39,12 +39,6 @@ eff_dis = 0.94 #battery discharging efficeicny
 eff_ch = 0.94 #battery charging efficeicny
 
 
-######## other parameters too add?
-
-"""Question 3 global vairables"""
-
-EMISSION_CONSTRAINTS = list(range(1,11,1))
-
 def get_minimal_cost(season):
     
     #load either summer or winter input variables
@@ -52,7 +46,6 @@ def get_minimal_cost(season):
     Pdem = season['Residential load [kW]']
     Celec = season['Electricity price [euro/kWh]']
     Emis = season['Marginal emission factor [kg CO2eq/kWh]']
-
     
     # Create Model
     m=gp.Model()
@@ -62,7 +55,6 @@ def get_minimal_cost(season):
     Pbat_dis = m.addVars(T, lb= 0, ub= Pbatmax, vtype= gp.GRB.CONTINUOUS, name= "Pbat_dis")
     
     Pgrid = m.addVars(T, lb= -Pgridmax, ub= Pgridmax, vtype= gp.GRB.CONTINUOUS, name= "Pgrid")
-    
     SoC = m.addVars(T, lb= SoC_min, ub= SoC_max, vtype= gp.GRB.CONTINUOUS, name= "SoC")
         
     # Add Constraints  
@@ -76,8 +68,10 @@ def get_minimal_cost(season):
     m.addConstrs(SoC_max >= SoC[t] for t in range(T))
     
      ## EMMISSIONS CONSTRAINTS - Q3
+    #m.addConstr((gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T))) <= 13.724252032773677)
     
     # Set objective function and solve
+    m.setParam('OutputFlag', 0) #remove all the gurobi output stuff we don't need
     obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
     m.setObjective(obj, gp.GRB.MINIMIZE)
     m.optimize()
@@ -89,15 +83,27 @@ def get_minimal_cost(season):
     season['Pbat'] = season['Pbat_ch'] - season['Pbat_dis'] #query, maybe other way around is nicer for explaining?
     season['SoC'] = m.getAttr("X", SoC).values()
 
-    emissions = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
-    print('emissions = ' + str(emissions))
+    emissions = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)).getValue() 
+    #print the cost and emissions associted with the model run
+    print('emissions = ' + str(emissions)) 
+    print("cost = " + str(m.getObjective().getValue()))
     
     return season
 
 summer_out_costmin = get_minimal_cost(summer)
 winter_out_costmin = get_minimal_cost(winter)
+print("Cbat "+ str(C_bat)) #was playing with effects of changing Cbat
+
+#find mac Pbat and Pgrid to investigate constraint activation
+max_pbat_row = winter_out_costmin.iloc[winter_out_costmin['Pbat_dis'].idxmax(axis=0)]
+print("max bat row" + str(max_pbat_row,))
+max_grid =  summer_out_costmin.iloc[summer_out_costmin['Pgrid'].idxmin(axis=0)]
+print("max grid row" + str(max_grid))
 
 #%%
+
+"""Creating the plots"""
+
 def get_plots_Pbat_Pgrid_elecprice(season1, season2):
 
         fig, axs = plt.subplots(nrows =2, ncols=1, sharex=True, sharey=True)
@@ -137,14 +143,10 @@ def get_plots_Pbat_Pgrid_elecprice(season1, season2):
         ax1t.legend(allplots2, labels3, bbox_to_anchor=(
             1.12, 1), loc='upper left')
          
-        axs[1].set_xlabel('Time (hours)')
+        axs[1].set_xlabel('Time [hour]')
         
 get_plots_Pbat_Pgrid_elecprice(summer_out_costmin, winter_out_costmin)
 
-max_pbat_row = winter_out_costmin.iloc[winter_out_costmin['Pbat_dis'].idxmax(axis=0)]
-print(max_pbat_row)
-max_grid =  summer_out_costmin.iloc[summer_out_costmin['Pgrid'].idxmin(axis=0)]
-print(max_grid)
 #%%
 
 def get_plots_SOC(season1,season2):

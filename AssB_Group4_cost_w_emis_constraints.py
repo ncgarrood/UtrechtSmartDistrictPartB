@@ -37,13 +37,14 @@ C_bat = 13.5 #battery capacity parameter for a Tesla Powerwall rated at 13,5 [kW
 eff_dis = 0.94 #battery discharging efficeicny
 eff_ch = 0.94 #battery charging efficeicny
 
-######## Plot power demand and PV generation data
-f1 = plt.figure(1)
-
 
 """Question 3 global vairables"""
+
 EMISSION_CONSTRAINTS_SUMMER = np.linspace(12.889924867969496, -1.435135121e+01, num=10) 
 EMISSION_CONSTRAINTS_WINTER = np.linspace(26.776254443847375, 6.722496217e-01, num=10) 
+
+
+"""Functions"""
 
 def get_minimal_cost(season):
     
@@ -89,13 +90,14 @@ def get_minimal_cost(season):
         
         m.addConstr((gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T))) <= i)
         
-        #m.setParam('OutputFlag', 0) # dont print all the gurobi output stuff
+        m.setParam('OutputFlag', 0) # dont print all the gurobi output stuff
         obj = gp.quicksum(Celec[t]*Pgrid[t]*Delta_t for t in range(T)) #for the end units to be in euro need to multiply by deltaT
         m.setObjective(obj, gp.GRB.MINIMIZE)
         m.optimize()
          
         #add the values to the new df
-        cost = m.getObjective().getValue()
+        unroundedcost = m.getObjective().getValue()
+        cost = round(unroundedcost,2)
         emissions = gp.quicksum(Emis[t]*Pgrid[t]*Delta_t for t in range(T)).getValue()
         df.loc[len(df)] = [i, cost, emissions]
     
@@ -122,5 +124,13 @@ plt.ylabel('Costs [€]')
 plt.ylim(-0.75,1.5,0.25)
 
 
-rEMISSION_CONSTRAINTS_SUMMER = EMISSION_CONSTRAINTS_SUMMER.round(3)
-rEMISSION_CONSTRAINTS_WINTER = EMISSION_CONSTRAINTS_WINTER.round(3)
+
+"""Calculations for write up Q3 """
+
+# rEMISSION_CONSTRAINTS_SUMMER = EMISSION_CONSTRAINTS_SUMMER.round(2)
+# rEMISSION_CONSTRAINTS_WINTER = EMISSION_CONSTRAINTS_WINTER.round(2)
+
+medsum = np.median(summer_out_constraints.Emissions)
+medwin = np.median(winter_out_constraints.Emissions)
+print(' summer emissions ' +str(medsum))
+print( ' winter emissions ' +str(medwin))
