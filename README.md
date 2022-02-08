@@ -1,3 +1,3 @@
 # UtrechtSmartDistrictPartB
  Home Energy Management Optimisation
-/n Assignment guide is found in Manual.pdf 
+\n Assignment guide is found in Manual.pdf 
